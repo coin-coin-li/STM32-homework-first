@@ -95,9 +95,9 @@ int main(void)
   while (1)
   {
 		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_9,GPIO_PIN_SET);	
-		HAL_Delay(500);
+		HAL_Delay(250);
 		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_9,GPIO_PIN_RESET);
-		HAL_Delay(500);		
+		HAL_Delay(250);		
 		
     /* USER CODE END WHILE */
 
