@@ -18,6 +18,8 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
+#include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -42,12 +44,13 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+volatile uint16_t adcvalue=0;
+volatile float result=0.0f;
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -86,17 +89,25 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
+
+		
+while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+		HAL_ADC_Start(&hadc1);
+		HAL_ADC_PollForConversion(&hadc1,10);
+		adcvalue=HAL_ADC_GetValue(&hadc1);
+		result=(adcvalue)/(4096.0f)*3.3f;
+			
   }
   /* USER CODE END 3 */
 }
@@ -109,6 +120,7 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -138,62 +150,15 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-}
-
-/**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GPIO_Init(void)
-{
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-  /* USER CODE BEGIN MX_GPIO_Init_1 */
-
-  /* USER CODE END MX_GPIO_Init_1 */
-
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : PA0 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PA9 */
-  GPIO_InitStruct.Pin = GPIO_PIN_9;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI0_IRQn, 15, 0);
-  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-
-  /* USER CODE BEGIN MX_GPIO_Init_2 */
-
-  /* USER CODE END MX_GPIO_Init_2 */
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
+  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV6;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+  {
+    Error_Handler();
+  }
 }
 
 /* USER CODE BEGIN 4 */
-void	HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	if(GPIO_Pin==GPIO_PIN_0)
-		{
-			HAL_Delay(20);
-			if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_0)==GPIO_PIN_RESET)
-				{
-					HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_9);
-				}
-		}
-}
-
 
 /* USER CODE END 4 */
 
