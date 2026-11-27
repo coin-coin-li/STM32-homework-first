@@ -107,14 +107,14 @@ int main(void)
 		{
 			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, i);            
 			__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 500 + i * 4);  
-			HAL_Delay(5);
+			HAL_Delay(2);
 		}
 
 		for (i = 499; i >= 0; i--)
 		{
 			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, i);            
 			__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 500 + i * 4);  
-			HAL_Delay(5);
+			HAL_Delay(2);
 		}
 
   }
